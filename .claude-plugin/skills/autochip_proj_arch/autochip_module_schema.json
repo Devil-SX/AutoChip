@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/ic-module-schema",
+  "title": "IC Module Definition",
+  "description": "Schema for a single IC module with support for recursive submodule definitions or external references via $ref",
+  "type": "object",
+  "required": ["name", "filepath", "docpath"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Name of the module"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
+      "default": "1.0.0",
+      "description": "Module version following semantic versioning (MAJOR.MINOR.PATCH) as defined in chip_semantic_versioning SKILL. Pre-release identifiers (alpha, beta, rc) and build metadata are optional."
+    },
+    "filepath": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Path to the module source file"
+    },
+    "docpath": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Path to the module documentation"
+    },
+    "submodules": {
+      "oneOf": [
+        {
+          "type": "array",
+          "description": "List of submodules (inline definitions or external references)",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#",
+                "description": "Inline submodule definition using the same schema"
+              },
+              {
+                "type": "object",
+                "required": ["$ref"],
+                "properties": {
+                  "$ref": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Reference to external module JSON file (relative path)"
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        {
+          "type": "null",
+          "description": "No submodules"
+        }
+      ],
+      "default": null
+    },
+    "test": {
+      "$ref": "#/$defs/test",
+      "description": "Test configuration for the module"
+    }
+  },
+  "$defs": {
+    "test": {
+      "type": "object",
+      "description": "Test configuration for a module",
+      "required": ["testbench_path", "golden_model_path", "test_case"],
+      "properties": {
+        "testbench_path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to the testbench file"
+        },
+        "golden_model_path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to the golden model"
+        },
+        "test_case": {
+          "type": "array",
+          "description": "List of test cases",
+          "items": {
+            "$ref": "#/$defs/testCase"
+          }
+        }
+      }
+    },
+    "testCase": {
+      "type": "object",
+      "description": "A test case for verification",
+      "required": ["name", "run_cmd", "output_log_path"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Name of the test case"
+        },
+        "run_cmd": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Command to run the test"
+        },
+        "output_log_path": {
+          "type": "array",
+          "description": "List of output log file paths",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "output_wave_path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path to the output wave file (optional)"
+        }
+      }
+    }
+  }
+}

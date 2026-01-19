@@ -1,0 +1,30 @@
+{
+  "name": "cache_controller",
+  "filepath": "./src/cache.v",
+  "docpath": "./docs/cache.md",
+  "submodules": [
+    {
+      "name": "l1_cache",
+      "filepath": "./src/l1_cache.v",
+      "docpath": "./docs/l1_cache.md",
+      "submodules": null
+    }
+  ],
+  "test": {
+    "testbench_path": "./test/tb_cache.sv",
+    "golden_model_path": "./test/golden/cache_model.py",
+    "test_case": [
+      {
+        "name": "read_hit",
+        "run_cmd": "make test_cache_read_hit",
+        "output_log_path": ["./log/cache_read.log"]
+      },
+      {
+        "name": "write_miss",
+        "run_cmd": "make test_cache_write_miss",
+        "output_log_path": ["./log/cache_write.log", "./log/cache_stats.log"],
+        "output_wave_path": "./wave/cache_write_miss.vcd"
+      }
+    ]
+  }
+}

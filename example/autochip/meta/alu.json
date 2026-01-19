@@ -1,0 +1,28 @@
+{
+  "name": "alu",
+  "filepath": "./src/alu.v",
+  "docpath": "./docs/alu.md",
+  "submodules": null,
+  "test": {
+    "testbench_path": "./test/tb_alu.sv",
+    "golden_model_path": "./test/golden/alu_model.py",
+    "test_case": [
+      {
+        "name": "addition",
+        "run_cmd": "make test_alu_add",
+        "output_log_path": ["./log/alu_add.log"],
+        "output_wave_path": "./wave/alu_add.vcd"
+      },
+      {
+        "name": "subtraction",
+        "run_cmd": "make test_alu_sub",
+        "output_log_path": ["./log/alu_sub.log"]
+      },
+      {
+        "name": "logical_operations",
+        "run_cmd": "make test_alu_logic",
+        "output_log_path": ["./log/alu_logic.log"]
+      }
+    ]
+  }
+}

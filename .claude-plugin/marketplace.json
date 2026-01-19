@@ -1,0 +1,25 @@
+{
+  "name": "autochip",
+  "owner": {
+    "name": "ShuchengDU",
+    "email": "sduaf@connect.ust.hk"
+  },
+  "plugins": [
+    {
+      "name": "autochip",
+      "source": "./.claude-plugin/",
+      "description": "AI-powered development workflow with planning, implementation, and review commands",
+      "version": "0.0.0",
+      "author": {
+        "name": "ShuchengDU",
+        "email": "sduaf@connect.ust.hk"
+      },
+      "homepage": "https://github.com/Devil-SX/autochip",
+      "repository": "https://github.com/Devil-SX/autochip",
+      "license": "MIT",
+      "keywords": ["workflow"],
+      "category": "development",
+      "strict": false
+    }
+  ]
+}

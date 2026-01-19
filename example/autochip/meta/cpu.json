@@ -1,0 +1,26 @@
+{
+  "name": "cpu",
+  "filepath": "./src/cpu.v",
+  "docpath": "./docs/cpu.md",
+  "submodules": [
+    { "$ref": "./alu.json" },
+    { "$ref": "./cache_controller.json" }
+  ],
+  "test": {
+    "testbench_path": "./test/tb_cpu.sv",
+    "golden_model_path": "./test/golden/cpu_model.py",
+    "test_case": [
+      {
+        "name": "basic_arithmetic",
+        "run_cmd": "make test_cpu_basic",
+        "output_log_path": ["./log/cpu_basic.log"]
+      },
+      {
+        "name": "memory_access",
+        "run_cmd": "make test_cpu_mem",
+        "output_log_path": ["./log/cpu_mem.log", "./log/cpu_mem_stats.log"],
+        "output_wave_path": "./wave/cpu_mem.vcd"
+      }
+    ]
+  }
+}
