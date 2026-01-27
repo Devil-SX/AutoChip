@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "autochip",
-      "source": "./.claude-plugin/",
+      "source": "./",
       "description": "AI-powered development workflow with planning, implementation, and review commands",
       "version": "0.0.0",
       "author": {
@@ -17,9 +17,22 @@
       "homepage": "https://github.com/Devil-SX/autochip",
       "repository": "https://github.com/Devil-SX/autochip",
       "license": "MIT",
-      "keywords": ["workflow"],
+      "keywords": [
+        "workflow"
+      ],
       "category": "development",
-      "strict": false
+      "strict": false,
+      "mcpServers": {
+        "WaveTool": {
+          "command": "uv",
+          "args": [
+            "run",
+            "--directory",
+            "${CLAUDE_PLUGIN_ROOT}/WaveMCP",
+            "mcp_server.py"
+          ]
+        }
+      }
     }
   ]
 }

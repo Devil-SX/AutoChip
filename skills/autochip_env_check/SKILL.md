@@ -17,6 +17,7 @@ This skill checks whether the development environment required to run AutoChip A
 - **cocotb** 2.x
 - **jsonschema** (required for IC project schema validation)
 
+
 ### Check Method
 
 Use the `find` command to recursively search the project directory for `.autochip/env.yaml`. If it exists, read the file and compare the timestamp with the current time. If the difference exceeds 6 hours, perform the environment check and proceed with Step 1/2/3. Otherwise, skip Step 1/2/3 and return that the environment is correct.
