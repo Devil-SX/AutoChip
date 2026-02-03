@@ -9,7 +9,7 @@
       "name": "autochip",
       "source": "./",
       "description": "AI-powered development workflow with planning, implementation, and review commands",
-      "version": "0.0.0",
+      "version": "0.0.1",
       "author": {
         "name": "ShuchengDU",
         "email": "sduaf@connect.ust.hk"
