@@ -1,0 +1,134 @@
+"""VCD waveform file parser using vcdvcd."""
+
+from pathlib import Path
+
+from vcdvcd import VCDVCD
+
+from ..utils.format import format_value
+
+
+class WaveformParser:
+    """Parser for VCD waveform files using vcdvcd."""
+
+    def __init__(self, vcd_path: str):
+        self.vcd_path = Path(vcd_path)
+        self.vcd = VCDVCD(str(self.vcd_path))
+
+    def get_signal_list(
+        self,
+        module_path: str = "",
+        max_depth: int = -1,
+        limit: int = 100,
+        pattern: str = "",
+        use_regex: bool = False,
+    ) -> tuple[list[dict], int]:
+        """Get list of signals with hierarchical filtering.
+
+        Args:
+            module_path: Filter signals under this module path (e.g., "top.cpu").
+                         Empty string means root (all modules).
+            max_depth: Maximum depth relative to module_path (-1 for unlimited).
+                       For example, max_depth=1 returns only direct children.
+            limit: Maximum number of signals to return (default: 100, 0 for unlimited).
+            pattern: Filter pattern for signal names (empty string for no filter).
+            use_regex: If True, treat pattern as regex; if False, use substring match.
+
+        Returns:
+            Tuple of (signals_list, total_count)
+            - signals_list: List of signal dicts (limited by 'limit')
+            - total_count: Total number of matching signals before limit
+        """
+        import re
+
+        # Compile regex pattern if needed
+        regex = None
+        if pattern and use_regex:
+            regex = re.compile(pattern)
+
+        signals = []
+        module_prefix = module_path + "." if module_path else ""
+        module_depth = module_path.count(".") + 1 if module_path else 0
+
+        for sig_name in self.vcd.signals:
+            # Filter by module_path
+            if module_path and not sig_name.startswith(module_prefix):
+                continue
+
+            # Filter by max_depth
+            if max_depth >= 0:
+                sig_depth = sig_name.count(".")
+                relative_depth = sig_depth - module_depth + 1
+                if relative_depth > max_depth:
+                    continue
+
+            # Filter by pattern
+            if pattern:
+                if use_regex:
+                    if not regex.search(sig_name):
+                        continue
+                else:
+                    if pattern not in sig_name:
+                        continue
+
+            sig_obj = self.vcd[sig_name]
+            signals.append({
+                'name': sig_name.split('.')[-1],
+                'type': sig_obj.var_type,
+                'size': sig_obj.size,
+                'path': sig_name,
+            })
+
+        total_count = len(signals)
+        if limit > 0:
+            signals = signals[:limit]
+        return signals, total_count
+
+    def get_time_range(self) -> tuple[int, int]:
+        """Get the total time range of the waveform."""
+        return (self.vcd.begintime, self.vcd.endtime)
+
+    def get_signal_values(
+        self,
+        signal_names: list[str],
+        start_time: int,
+        end_time: int,
+        fmt: str = "bin",
+    ) -> tuple[dict[str, list[tuple[int, str]]], list[str]]:
+        """Get signal values within specified time range.
+
+        Args:
+            signal_names: List of signal names for case-insensitive substring matching
+            start_time: Start time (in VCD time units)
+            end_time: End time (in VCD time units)
+            fmt: Output format - "bin" (default), "hex", or "dec"
+
+        Returns:
+            Tuple of (result_dict, warnings_list)
+            - result_dict: Dictionary mapping signal paths to list of (time, formatted_value) tuples
+            - warnings_list: List of warning messages for values that fell back to binary
+        """
+        result = {}
+        warnings = []
+
+        # Find matching signals
+        for sig_name in self.vcd.signals:
+            # Check if signal matches any name (case-insensitive substring match)
+            matches = any(
+                name.lower() in sig_name.lower()
+                for name in signal_names
+            )
+            if not matches:
+                continue
+
+            sig_obj = self.vcd[sig_name]
+            values = []
+            for t, v in sig_obj.tv:
+                if start_time <= t <= end_time:
+                    formatted, warning = format_value(str(v), fmt)
+                    values.append((t, formatted))
+                    if warning:
+                        warnings.append(f"{sig_name}@{t}: {warning}")
+            if values:
+                result[sig_name] = values
+
+        return result, warnings
